@@ -1,5 +1,5 @@
 # django_mdmail
-# Version: 0.1
+# Version: 0.2
 # Authors: Helgi Hrafn Gunnarsson <helgi@binary.is>
 # Repository: https://github.com/binary-is/django_mdmail
 # License: MIT
@@ -26,36 +26,47 @@
 #
 # You will need to have these Python packages installed: mdmail django
 #
-# Limitations:
-#
-# * Since `mdmail` uses the native Python libraries to send the email,
-#   Django's email backend is ignored. The mail gets delivered through SMTP
-#   according to Django's email settings, no matter which backend you've
-#   chosen.
-#
-# * The `html_message` parameter does nothing and is provided only for
-#   API-compatibility. This is because the HTML is generated from the Markdown
-#   provided.
-#
-# * The `fail_silently` parameter does nothing, because `mdmail` always fails
-#   silently.
-#
-# If you need any of these limitations remedied, please contact the author or
-# better yet, contribute fixes and the author will be happy to include them!
+# Note: The parameter `html_message` can be used to override the HTML
+# generated from Markdown but this feature should only be used under special
+# circumstances because it defies the whole point of using `django_mdmail` in
+# the first place.
 
-from django.conf import settings
-import mdmail
+from django.core.mail import EmailMultiAlternatives
+from email.MIMEImage import MIMEImage
+from mdmail import EmailContent
 
 def send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None):
 
-    smtp = {
-        'host': settings.EMAIL_HOST,
-        'port': settings.EMAIL_PORT,
-        'tls': settings.EMAIL_USE_TLS,
-        'ssl': settings.EMAIL_USE_SSL,
-        'user': auth_user or settings.EMAIL_HOST_USER,
-        'password': auth_password or settings.EMAIL_HOST_PASSWORD,
-    }
+    # Have `mdmail` do its Markdown magic.
+    content = EmailContent(message)
 
-    for recipient in recipient_list:
-        print(mdmail.send(message, subject, from_email, recipient, smtp=smtp))
+    # Create the email message and fill it with the relevant data.
+    email = EmailMultiAlternatives(
+        subject,
+        content.text,
+        from_email,
+        recipient_list
+    )
+    email.attach_alternative(html_message or content.html, 'text/html')
+    email.mixed_subtype = 'related'
+
+    for filename, data in content.inline_images:
+        # Create the image from the image data.
+        image = MIMEImage(data.read())
+
+        # Give the image an ID so that it can be found via HTML.
+        image.add_header('Content-ID', '<{}>'.format(filename))
+
+        # This header allows users of some email clients (for example
+        # Thunderbird) to view the images as attachments when displaying the
+        # message as plaintext, without it interrupting those users who view
+        # it as HTML.
+        image.add_header(
+            'Content-Disposition', 'attachment; filename=%s' % filename
+        )
+
+        # Attach the image.
+        email.attach(image)
+
+    # Finally, send the message.
+    email.send(fail_silently)
