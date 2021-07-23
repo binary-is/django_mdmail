@@ -1,46 +1,5 @@
-# django_mdmail
-# Version: 0.4
-# Authors: Helgi Hrafn Gunnarsson <helgi@binary.is>
-# Repository: https://github.com/binary-is/django_mdmail
-# License: MIT
-#
-# Description: django_mdmail bridges the gap between the `mdmail` package and
-# Django. `mdmail` is a Python module that allows the sending of Markdown
-# email. Django is a web development framework which contains its own wrapper
-# functions for sending email. This package is a simple wrapper for `mdmail`
-# utilizing Django's email settings and imitating Django's email function
-# signature. Ideally, a Django user should be able to replace...
-#
-#     from django.core.mail import send_mail
-#
-# ...with...
-#
-#     from django_mdmail import send_mail
-#
-# ...to send Markdown emails with all the features of `mdmail`.
-#
-# Installation: This package is a single file with all the necessary
-# information provided in comments at the top. To install or upgrade, simply
-# place this file wherever you wish, import the `send_mail` function as
-# described above and use it according to Django's documentation.
-#
-# You will need to have these Python packages installed: mdmail django
-#
-# Note: The parameter `html_message` can be used to override the HTML
-# generated from Markdown but this feature should only be used under special
-# circumstances because it defies the whole point of using `django_mdmail` in
-# the first place.
-#
-# A function is also provided for processing *.md files into *.txt and *.html
-# in Django's template directories, for use with built-in functionality like
-# Django's forgotten-password mechanism. Run the function from some Django
-# app's ready() hook (see AppConfig.ready() in Django documentation) and
-# you'll only need to provide a Markdown version of those emails. Note that
-# you may still have to do some coding of your own to make sure that both text
-# and HTML emails are being sent (as opposed to only text emails).
-#
-# Limitations:
-# * No inline images in email templates created by `convert_md_templates`.
+__version__ = '0.4.1'
+
 import os
 import sys
 

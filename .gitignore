@@ -1,1 +1,4 @@
 *.swp
+/dist
+/django_mdmail.egg-info
+__pycache__
