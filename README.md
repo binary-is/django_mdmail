@@ -24,9 +24,17 @@ The most important design goal of this library is to allow a Django user to repl
 
 # Notes on parameters
 
-## `html_message`
+## Parameters from `mdmail`
 
-The parameter `html_message` can be used to override the HTML generated from Markdown, which completely defies the whole point of using `django_mdmail` in the first place. It is provided for compatibility.
+### `css`
+
+The parameter `css` can be used with both the `send_mail` and `convert_md_templates` functions, which then gets moved forward to `mdmail`'s underlying function, `EmailContent`. The `css` parameter should contain **CSS as text**, not as a filename.
+
+## Parameters from `django.core.mail.send_mail`
+
+### `html_message`
+
+The parameter `html_message` can be used with the `send_mail` function to override the HTML generated from markdown, although that completely defies the whole point of using `django_mdmail` in the first place. It is provided for API compatibility.
 
 # Template-driven emails
 
@@ -54,7 +62,6 @@ Assuming that this code runs without failure, then all you need to do in order t
 1. Images by URL are supported, with the caveat that if a user is using a responsible email client that respects people's privacy, the images will not be automatically shown, but only if the user specifically requests them. This may be problematic for a message that relies too heavily on images for either communication or aesthetics.
 
 2. Inline images are supported but they must be available on the server that sends the email (the Django server) and the image link in the markdown message must be relative to the Django project's root. This is partly a limitation of `mdmail`, but if you host your images on the same server as the Django instance that sends the emails, **you can indeed** use inline images that even the most annoyingly responsible email clients will display, assuming they render HTML in the first place.
-
 
 ## Known limitations
 
