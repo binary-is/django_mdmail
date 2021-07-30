@@ -18,6 +18,10 @@ The most important design goal of this library is to allow a Django user to repl
 
 ...to send markdown emails with all the features of the Django email functionality intact.
 
+# Installation
+
+    pip install django_mdmail
+
 # Notes on parameters
 
 ## `html_message`
