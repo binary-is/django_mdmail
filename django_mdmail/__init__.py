@@ -3,6 +3,7 @@ __version__ = '0.5.0'
 import os
 import sys
 
+from django.apps import apps
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 if sys.version_info[0] == 3:
@@ -76,11 +77,13 @@ def convert_md_templates(css=None):
 
     override_comment = '{%% comment %%}%s{%% endcomment %%}\n' % OVERRIDE_WARNING
 
-    # Find all the template directories we'll need to process and put them
-    # in a flat list.
+    # Add template directories for apps belonging to the running project.
     template_dirs = []
-    for template_conf in settings.TEMPLATES:
-        template_dirs += [d for d in template_conf['DIRS']]
+    for app_config in apps.get_app_configs():
+        # Check if this app belongs to our project and add its template
+        # directory if so.
+        if app_config.path == '%s/%s' % (settings.BASE_DIR, app_config.name):
+            template_dirs += ['%s/templates' % app_config.path]
 
     # Iterate the template directories.
     for template_dir in template_dirs:
